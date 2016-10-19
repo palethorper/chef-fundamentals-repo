@@ -21,7 +21,9 @@ end
 
 #Enable and apache virtual host
 apache_vhost "lions" do
+  site_port 8080
   action :create
+  notifies :restart, "service[httpd]"
 end
 
 # Iterate over the apache sites
