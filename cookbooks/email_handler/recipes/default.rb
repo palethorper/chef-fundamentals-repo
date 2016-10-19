@@ -12,6 +12,8 @@ chef_gem "pony" do
 end
 
 include_recipe "chef_handler"
+include_recipe 'postfix'
+include_recipe 'mailx'
 
 cookbook_file "#{node['chef_handler']['handler_path']}/email_handler.rb" do
 	source "handlers/email_handler.rb"
