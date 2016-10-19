@@ -4,6 +4,8 @@ property :site_port, :default => 80, :kind_of => Fixnum
 default_action :create
 
 action :create do 
+
+	puts "whatver"
 	# Set the document root
 	document_root = "/srv/apache/#{new_resource.site_name}"
 
