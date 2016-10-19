@@ -23,7 +23,11 @@ end
 
 # This allows dynamic setting of the package name at runtime (via the run_state)
 package "scripting_language" do
-  package_name lazy { node.run_state['scripting_language'] }
+
+  package_name lazy { 
+    #puts "Run language selected : #{node.run_state['scripting_language']}"
+    node.run_state['scripting_language'] 
+  }
   action :install
 end
 
