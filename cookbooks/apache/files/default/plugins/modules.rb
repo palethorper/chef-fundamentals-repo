@@ -6,7 +6,6 @@ Ohai.plugin(:Apache) do
 		apache[:modules] = { :static => [], :shared => [] }
 		modules = shell_out("apachectl -t -D DUMP_MODULES")
 		
-		#apache[:modules] = modules.stdout
 		modules.stdout.each_line do |line|
 			fullkey, value = line.split("(", 2).map { |token| token.strip }
 			apache_module = fullkey.gsub("_module","")
