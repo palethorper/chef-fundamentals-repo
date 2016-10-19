@@ -5,8 +5,5 @@ Ohai.plugin(:Apache) do
 	collect_data(:default) do
 		apache Mash.new
 		apache[:modules] = shell_out("apachectl -t -D DUMP_MODULES").stdout
-		#modules = shell_out("apachectl -t -D DUMP_MODULES").stdout
-		#apache[:modules] = modules.stdout
 	end
-
 end
