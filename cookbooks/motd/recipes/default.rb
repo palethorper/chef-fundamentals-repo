@@ -12,4 +12,5 @@ template "/etc/motd" do
   user "root"
   group "root"
   mode "0644"
+  action :create
 end
