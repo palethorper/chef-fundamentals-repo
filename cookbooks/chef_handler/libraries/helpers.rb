@@ -1,6 +1,6 @@
 #
 # Author:: Kartik Cating-Subramanian (<ksubramanian@chef.io>)
-# Copyright:: Copyright (c) 2015 Chef, Inc.
+# Copyright:: Copyright (c) 2015-2016 Chef Software, Inc.
 # License:: Apache License, Version 2.0
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,17 +15,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
 module ChefHandler
   module Helpers
-
     # Registers a handler in Chef::Config.
     #
     # @param handler_type [Symbol] such as :report or :exception.
     # @param handler [Chef::Handler] handler to register.
     def register_handler(handler_type, handler)
       Chef::Log.info("Enabling #{handler.class.name} as a #{handler_type} handler.")
-      Chef::Config.send("#{handler_type.to_s}_handlers") << handler
+      Chef::Config.send("#{handler_type}_handlers") << handler
     end
 
     # Removes all handlers that match the given class name in Chef::Config.
@@ -34,7 +32,7 @@ module ChefHandler
     # @param class_full_name [String] such as 'Chef::Handler::ErrorReport'.
     def unregister_handler(handler_type, class_full_name)
       Chef::Log.info("Disabling #{class_full_name} as a #{handler_type} handler.")
-      Chef::Config.send("#{handler_type.to_s}_handlers").delete_if { |v| v.class.name == class_full_name }
+      Chef::Config.send("#{handler_type}_handlers").delete_if { |v| v.class.name == class_full_name }
     end
 
     # Walks down the namespace heirarchy to return the class object for the given class name.
@@ -51,38 +49,7 @@ module ChefHandler
       # (see COOK-4117).
       parent = ancestors.inject(Kernel) { |scope, const_name| scope.const_get(const_name, scope === Kernel) }
       child = parent.const_get(class_name, parent === Kernel)
-      return parent, child
-    end
-
-    # Unloads a given class and reloads it from the file provided.
-    #
-    # @param class_full_name [String] full class name such as 'Chef::Handler::Foo'.  If a class
-    #   with that name currently exists, its definition is deleted from the enclosing module.
-    # @param file_name [String] full path to the ruby file to be loaded.  If path doesn't end with
-    #   .rb, that extension is appended.
-    # @return [Class] definition for the freshly loaded class.
-    def reload_class(class_full_name, file_name)
-      begin
-        parent, child = get_class(class_full_name)
-      rescue
-        Chef::Log.debug("#{class_full_name} was not previously loaded.")
-      end
-
-      if child then
-        class_name = class_full_name.split('::').last
-        child = nil
-        parent = Object if parent === Kernel
-        parent.send(:remove_const, class_name)
-        GC.start
-      end
-
-      # Use load instead of require because we need to explicitly avoid any caching that 'require'
-      # performs.  If the file has changed, we want to get the changes.
-      file_name << '.rb' unless file_name =~ /.*\.rb$/
-      load file_name
-
-      parent, child = get_class(class_full_name)
-      return child
+      [parent, child]
     end
   end
 end
